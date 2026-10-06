@@ -129,7 +129,7 @@ new_decode='''        if (type == 0x20 && f.length == 27) {
 '''
 rep(old_decode,new_decode,"decoder")
 
-old_update='''    private void updateDecoder(boolean light, boolean brake, int socLike, int counterLike) {
+old_update=r'''    private void updateDecoder(boolean light, boolean brake, int socLike, int counterLike) {
         String voltage = batteryCentivolts > 0 ? String.format(Locale.US, "%.2f V", batteryCentivolts / 100.0) : "—";
         String txt = "R8 LIVE  •  Light: " + (light ? "ON" : "OFF")
                 + "  •  Brake: " + (brake ? "ON" : "OFF")
@@ -139,7 +139,7 @@ old_update='''    private void updateDecoder(boolean light, boolean brake, int s
         if (decodedView != null) decodedView.setText(txt);
     }
 '''
-new_update='''    private void updateDecoder(boolean light, boolean brake, int socLike, int packed) {
+new_update=r'''    private void updateDecoder(boolean light, boolean brake, int socLike, int packed) {
         String voltage = batteryCentivolts > 0 ? String.format(Locale.US, "%.2f V", batteryCentivolts / 100.0) : "—";
         String unit = mphUnits ? "mph" : "km/h";
         String cap = currentSpeedLimitRaw >= 0 ? currentSpeedLimitRaw + " " + unit : "—";
