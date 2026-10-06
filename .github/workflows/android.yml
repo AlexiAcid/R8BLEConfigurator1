@@ -160,6 +160,9 @@ jobs:
       - name: Apply v0.4 acknowledged-write diagnostic
         run: python3 patch_v04.py
 
+      - name: Apply v0.5 official speed protocol
+        run: python3 patch_v05.py
+
       - name: Build debug APK
         working-directory: R8BLEConfigurator
         run: gradle :app:assembleDebug --stacktrace
@@ -167,6 +170,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: R8BLEConfigurator-v0.4-debug-apk
+          name: R8BLEConfigurator-v0.5-debug-apk
           path: R8BLEConfigurator/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
