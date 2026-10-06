@@ -30,6 +30,130 @@ jobs:
       - name: Extract Android project
         run: unzip -q R8BLEConfigurator-source.zip
 
+      - name: Apply mobile scrolling fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("R8BLEConfigurator/app/src/main/java/com/openai/r8ble/MainActivity.java")
+          s = p.read_text()
+
+          s = s.replace(
+              "import android.view.View;\n",
+              "import android.view.View;\nimport android.view.MotionEvent;\n"
+          )
+          s = s.replace(
+              "import java.util.ArrayList;\n",
+              "import java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.Comparator;\n"
+          )
+          s = s.replace(
+              'append("R8 BLE Configurator v0.1 ready. Target device name: R8-US");',
+              'append("R8 BLE Configurator v0.2 ready. Target device name: R8-US");'
+          )
+
+          s = s.replace(
+              """        deviceList.setMinimumHeight(dp(130));
+                  root.addView(deviceList, new LinearLayout.LayoutParams(-1, dp(150)));""",
+              """        deviceList.setMinimumHeight(dp(130));
+                  deviceList.setNestedScrollingEnabled(true);
+                  enableFingerScrolling(deviceList);
+                  root.addView(deviceList, new LinearLayout.LayoutParams(-1, dp(150)));"""
+          )
+
+          s = s.replace(
+              """        root.addView(label("GATT characteristics — tap one to select"));
+                  ListView charList = new ListView(this);
+                  charAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+                  charList.setAdapter(charAdapter);
+                  charList.setMinimumHeight(dp(220));
+                  root.addView(charList, new LinearLayout.LayoutParams(-1, dp(260)));""",
+              """        root.addView(label("GATT characteristics — swipe this list with your finger; likely controller channels are shown first"));
+                  ListView charList = new ListView(this);
+                  charAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+                  charList.setAdapter(charAdapter);
+                  charList.setMinimumHeight(dp(280));
+                  charList.setNestedScrollingEnabled(true);
+                  charList.setVerticalScrollBarEnabled(true);
+                  charList.setScrollbarFadingEnabled(false);
+                  enableFingerScrolling(charList);
+                  root.addView(charList, new LinearLayout.LayoutParams(-1, dp(340)));"""
+          )
+
+          marker = "    private LinearLayout row() {\n"
+          helper = """    private void enableFingerScrolling(ListView list) {
+                  list.setOnTouchListener((v, event) -> {
+                      boolean active = event.getActionMasked() != MotionEvent.ACTION_UP
+                              && event.getActionMasked() != MotionEvent.ACTION_CANCEL;
+                      if (v.getParent() != null) v.getParent().requestDisallowInterceptTouchEvent(active);
+                      return false;
+                  });
+              }
+
+              private int characteristicPriority(BluetoothGattCharacteristic c) {
+                  int p = c.getProperties();
+                  int score = 0;
+                  if ((p & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) score += 20;
+                  if ((p & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) score += 20;
+                  if ((p & BluetoothGattCharacteristic.PROPERTY_WRITE) != 0) score += 12;
+                  if ((p & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0) score += 12;
+                  if ((p & BluetoothGattCharacteristic.PROPERTY_READ) != 0) score += 2;
+                  String u = c.getUuid().toString().toLowerCase(Locale.US);
+                  if (u.startsWith("00002a") && u.endsWith("-0000-1000-8000-00805f9b34fb")) score -= 20;
+                  return score;
+              }
+
+              private boolean likelyControllerCharacteristic(BluetoothGattCharacteristic c) {
+                  int p = c.getProperties();
+                  boolean tx = (p & (BluetoothGattCharacteristic.PROPERTY_WRITE
+                          | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) != 0;
+                  boolean rx = (p & (BluetoothGattCharacteristic.PROPERTY_NOTIFY
+                          | BluetoothGattCharacteristic.PROPERTY_INDICATE)) != 0;
+                  return tx || rx;
+              }
+
+          """
+          if helper not in s:
+              s = s.replace(marker, helper + marker)
+
+          old = """        characteristics.clear();
+                  charAdapter.clear();
+                  for (BluetoothGattService s : g.getServices()) {
+                      append("SERVICE " + s.getUuid());
+                      for (BluetoothGattCharacteristic c : s.getCharacteristics()) {
+                          characteristics.add(c);
+                          String line = c.getUuid() + "  [" + props(c) + "]";
+                          charAdapter.add(line);
+                          append("  CHAR " + line);
+                          for (BluetoothGattDescriptor d : c.getDescriptors()) append("    DESC " + d.getUuid());
+                      }
+                  }
+                  append("Choose a characteristic. Start with READ/NOTIFY; do not write unknown bytes.");"""
+
+          new = """        characteristics.clear();
+                  charAdapter.clear();
+                  for (BluetoothGattService s : g.getServices()) {
+                      append("SERVICE " + s.getUuid());
+                      for (BluetoothGattCharacteristic c : s.getCharacteristics()) {
+                          characteristics.add(c);
+                          String line = c.getUuid() + "  [" + props(c) + "]";
+                          append("  CHAR " + line);
+                          for (BluetoothGattDescriptor d : c.getDescriptors()) append("    DESC " + d.getUuid());
+                      }
+                  }
+                  Collections.sort(characteristics, Comparator.comparingInt(this::characteristicPriority).reversed());
+                  for (BluetoothGattCharacteristic c : characteristics) {
+                      String prefix = likelyControllerCharacteristic(c) ? "★ " : "";
+                      charAdapter.add(prefix + c.getUuid() + "  [" + props(c) + "]");
+                  }
+                  append("Loaded " + characteristics.size() + " characteristics. Candidates with WRITE/NOTIFY are sorted to the top and marked ★.");
+                  append("Swipe inside the characteristic box to scroll. Start with READ/NOTIFY; do not write unknown bytes.");"""
+
+          if old not in s:
+              raise SystemExit("Expected populateGatt block not found")
+          s = s.replace(old, new)
+
+          p.write_text(s)
+          PY
+
       - name: Build debug APK
         working-directory: R8BLEConfigurator
         run: gradle :app:assembleDebug --stacktrace
@@ -37,6 +161,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: R8BLEConfigurator-debug-apk
+          name: R8BLEConfigurator-v0.2-debug-apk
           path: R8BLEConfigurator/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
