@@ -45,19 +45,23 @@ replacement='''        gauge.addView(gpsSpeedView,new android.widget.FrameLayout
         batteryLp.bottomMargin=dp(26);
         gauge.addView(batteryRow,batteryLp);'''
 s=s.replace(needle,replacement,1)
-# Update percentage only when live bike telemetry is decoded.
-needle='            String ride = "▰  " + socLike + "%"'
-if needle not in s: raise SystemExit("live telemetry anchor missing")
-s=s.replace(needle,'''            if(dashboardBatteryPercent!=null) {
-                dashboardBatteryPercent.setText(socLike + "%");
-                try {
-                    int batteryLevel=Math.max(0,Math.min(100,Integer.parseInt(String.valueOf(socLike).trim())));
-                    dashboardBatteryBar.setProgress(batteryLevel);
-                    dashboardBatteryBar.setProgressTintList(android.content.res.ColorStateList.valueOf(
-                        batteryLevel<=20 ? 0xFFFF4030 : batteryLevel<=40 ? 0xFFFFAA00 : 0xFF00F030));
-                } catch(Exception ignored) {}
+# Observe the live telemetry summary, independent of decoder internals.
+needle='        ride.addView(rideStateView);'
+if needle not in s: raise SystemExit("rideStateView anchor missing")
+s=s.replace(needle,'''        ride.addView(rideStateView);
+        rideStateView.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence text,int start,int count,int after) {}
+            public void onTextChanged(CharSequence text,int start,int before,int count) {
+                java.util.regex.Matcher m=java.util.regex.Pattern.compile("(\\\\d{1,3})%").matcher(text);
+                if(!m.find() || dashboardBatteryPercent==null) return;
+                int batteryLevel=Math.max(0,Math.min(100,Integer.parseInt(m.group(1))));
+                dashboardBatteryPercent.setText(batteryLevel+"%");
+                dashboardBatteryBar.setProgress(batteryLevel);
+                dashboardBatteryBar.setProgressTintList(android.content.res.ColorStateList.valueOf(
+                    batteryLevel<=20 ? 0xFFFF4030 : batteryLevel<=40 ? 0xFFFFAA00 : 0xFF00F030));
             }
-            String ride = "▰  " + socLike + "%"''',1)
+            public void afterTextChanged(android.text.Editable text) {}
+        });''',1)
 # Make the gauge more compact to fit the ride controls.
 s=s.replace('new LinearLayout.LayoutParams(dp(252),dp(252))','new LinearLayout.LayoutParams(dp(280),dp(280))',1)
 p.write_text(s)
