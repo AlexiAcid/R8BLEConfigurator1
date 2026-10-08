@@ -64,7 +64,7 @@ im.save(res/"r8_photo_sunset.jpg",quality=89,optimize=True)
 # Replace PNG drawable name with new JPEG asset by removing old PNG, avoiding duplicate resource.
 old=res/"r8_photo_sunset.png"
 if old.exists(): old.unlink()
-print("v2.3 PHOTO bundled",im.size,"JPEG bytes",(res/"r8_ride_background.jpg").stat().st_size)
+print("v2.3 PHOTO bundled",im.size,"JPEG bytes",(res/"r8_photo_sunset.jpg").stat().st_size)
 
 # Replace the old layer-list silhouette with a full-screen photo drawable.
 xml=res/"r8_ride_background.xml"
