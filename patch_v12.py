@@ -39,12 +39,12 @@ rep('''        LinearLayout capRow = row();
         profileHint.setText("FULL SPEED 62 only works when the bike reports hidden maximum >= 62. Your latest physical secret-menu test successfully changed that maximum between 32 and 62.");
         root.addView(profileHint);
 
-        LinearLayout lightRow = row();
+        LinearLayout rideLightRow = row();
         Button lightOnRide = button("LIGHT ON");
         Button lightOffRide = button("LIGHT OFF");
-        lightRow.addView(lightOnRide, weight());
-        lightRow.addView(lightOffRide, weight());
-        root.addView(lightRow);
+        rideLightRow.addView(lightOnRide, weight());
+        rideLightRow.addView(lightOffRide, weight());
+        root.addView(rideLightRow);
 
         LinearLayout utilityRow = row();''',
     "ride presets")
@@ -60,7 +60,7 @@ rep('''        applyCap.setOnClickListener(v -> applyRideSpeedCap());
     "preset listeners")
 
 rep('''        String txt = "R8 LIVE  •  Gear: " + gearRaw + "  •  Display unit: " + displayUnit''',
-'''        String profile = speedLimitMaxRaw >= 62 ? "FULL (62)" :
+'''        String speedProfile = speedLimitMaxRaw >= 62 ? "FULL (62)" :
                 (speedLimitMaxRaw > 0 ? "LIMITED (" + speedLimitMaxRaw + ")" : "unknown");
         String txt = "R8 LIVE  •  Gear: " + gearRaw + "  •  Display unit: " + displayUnit''',
     "profile var")
@@ -74,7 +74,7 @@ rep('''            String ride = "Bike: Gear " + gearRaw
 '''            String ride = "Bike: Gear " + gearRaw
                     + "  •  Battery " + socLike + "%"
                     + "  •  " + voltage
-                    + "\\nProfile: " + profile
+                    + "\\nProfile: " + speedProfile
                     + "  •  Controller cap: " + cap
                     + "  •  Range: " + range
                     + "\\nLight " + (light ? "ON" : "OFF")''',
