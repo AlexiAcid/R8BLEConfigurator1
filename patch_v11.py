@@ -231,9 +231,9 @@ rep('''        if (decodedView != null) decodedView.setText(txt);
             String ride = "Bike: Gear " + gearRaw
                     + "  •  Battery " + socLike + "%"
                     + "  •  " + voltage
-                    + "\nController cap: " + cap
+                    + "\\nController cap: " + cap
                     + "  •  Range: " + range
-                    + "\nLight " + (light ? "ON" : "OFF")
+                    + "\\nLight " + (light ? "ON" : "OFF")
                     + "  •  Brake " + (brake ? "ON" : "OFF")
                     + "  •  " + (dualDrive ? "DUAL" : "SINGLE") + " motor mode";
             rideStateView.setText(ride);
