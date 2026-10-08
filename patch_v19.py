@@ -1,5 +1,6 @@
 from pathlib import Path
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 import io
 
 p=Path("R8BLEConfigurator/app/src/main/java/com/openai/r8ble/MainActivity.java")
