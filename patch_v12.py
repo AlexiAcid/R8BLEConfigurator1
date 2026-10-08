@@ -68,13 +68,13 @@ rep('''        String txt = "R8 LIVE  •  Gear: " + gearRaw + "  •  Display u
 rep('''            String ride = "Bike: Gear " + gearRaw
                     + "  •  Battery " + socLike + "%"
                     + "  •  " + voltage
-                    + "\nController cap: " + cap
+                    + "\\nController cap: " + cap
                     + "  •  Range: " + range
-                    + "\nLight " + (light ? "ON" : "OFF")''',
+                    + "\\nLight " + (light ? "ON" : "OFF")''',
 '''            String ride = "Bike: Gear " + gearRaw
                     + "  •  Battery " + socLike + "%"
                     + "  •  " + voltage
-                    + "\nProfile: " + profile
+                    + "\\nProfile: " + profile
                     + "  •  Controller cap: " + cap
                     + "  •  Range: " + range
                     + "\nLight " + (light ? "ON" : "OFF")''',
