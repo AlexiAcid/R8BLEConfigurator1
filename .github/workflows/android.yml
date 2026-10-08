@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.3-polished-tabs, v1.4-polish-light-fix, v1.5-redesign, v1.6-concept-ui, v1.7-reference-ui, v1.8-release-shell, v1.9-visual-fix, v2.0-release, v2.1-mockup-match, v2.2-live-dashboard ]
+    branches: [ main, v1.3-polished-tabs, v1.4-polish-light-fix, v1.5-redesign, v1.6-concept-ui, v1.7-reference-ui, v1.8-release-shell, v1.9-visual-fix, v2.0-release, v2.1-mockup-match, v2.2-live-dashboard, v2.3-photo-finish ]
 
 permissions:
   contents: read
@@ -216,6 +216,9 @@ jobs:
       - name: Apply v2.2 live battery dashboard
         run: python3 patch_v22.py
 
+      - name: Apply v2.3 photographic dashboard
+        run: python3 patch_v23.py
+
       - name: Build debug APK
         working-directory: R8BLEConfigurator
         run: gradle :app:assembleDebug --stacktrace
@@ -223,6 +226,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: R8BLEConfigurator-v2.2-debug-apk
+          name: R8BLEConfigurator-v2.3-photo-apk
           path: R8BLEConfigurator/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
