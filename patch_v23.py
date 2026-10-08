@@ -60,8 +60,15 @@ for py in range(H):
 im=Image.alpha_composite(im.convert("RGBA"),overlay).convert("RGB")
 res=root/"res/drawable"
 res.mkdir(parents=True,exist_ok=True)
-im.save(res/"r8_ride_background.jpg",quality=89,optimize=True)
+im.save(res/"r8_photo_sunset.jpg",quality=89,optimize=True)
 # Replace PNG drawable name with new JPEG asset by removing old PNG, avoiding duplicate resource.
-old=res/"r8_ride_background.png"
+old=res/"r8_photo_sunset.png"
 if old.exists(): old.unlink()
 print("v2.3 PHOTO bundled",im.size,"JPEG bytes",(res/"r8_ride_background.jpg").stat().st_size)
+
+# Replace the old layer-list silhouette with a full-screen photo drawable.
+xml=res/"r8_ride_background.xml"
+xml.write_text('''<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item><bitmap android:src="@drawable/r8_photo_sunset" android:gravity="fill"/></item>
+</layer-list>''')
