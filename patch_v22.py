@@ -3,7 +3,7 @@ p=Path("R8BLEConfigurator/app/src/main/java/com/openai/r8ble/MainActivity.java")
 s=p.read_text()
 s=s.replace("R8 BLE Configurator v2.1 ready. Target device name: R8-US","R8 BLE Configurator v2.2 ready. Target device name: R8-US")
 # Field to retain live battery UI.
-needle="    private LinearLayout buildReleaseUi() {"
+needle="    private View buildReleaseUi() {"
 if needle not in s: raise SystemExit("missing buildReleaseUi")
 s=s.replace(needle,"    private TextView dashboardBatteryPercent;\n    private android.widget.ProgressBar dashboardBatteryBar;\n\n"+needle,1)
 # Replace plain text battery summary with a real icon/bar plus live percentage inside dial.
