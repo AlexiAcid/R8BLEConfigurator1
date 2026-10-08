@@ -77,7 +77,7 @@ rep('''            String ride = "Bike: Gear " + gearRaw
                     + "\\nProfile: " + profile
                     + "  •  Controller cap: " + cap
                     + "  •  Range: " + range
-                    + "\nLight " + (light ? "ON" : "OFF")''',
+                    + "\\nLight " + (light ? "ON" : "OFF")''',
     "ride profile status")
 
 rep('''    private void toggleRideUnits() {''',
