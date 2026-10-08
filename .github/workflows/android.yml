@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.3-polished-tabs, v1.4-polish-light-fix, v1.5-redesign, v1.6-concept-ui, v1.7-reference-ui, v1.8-release-shell, v1.9-visual-fix ]
+    branches: [ main, v1.3-polished-tabs, v1.4-polish-light-fix, v1.5-redesign, v1.6-concept-ui, v1.7-reference-ui, v1.8-release-shell, v1.9-visual-fix, v2.0-release ]
 
 permissions:
   contents: read
@@ -207,6 +207,9 @@ jobs:
           python3 -m pip install --user Pillow
           python3 patch_v19.py
 
+      - name: Apply v2.0 artwork and icon fixes
+        run: python3 patch_v20.py
+
       - name: Build debug APK
         working-directory: R8BLEConfigurator
         run: gradle :app:assembleDebug --stacktrace
@@ -214,6 +217,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: R8BLEConfigurator-v1.9-debug-apk
+          name: R8BLEConfigurator-v2.0-debug-apk
           path: R8BLEConfigurator/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
